@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CityscapeFooter, VIEW_H } from './components/CityscapeFooter'
 import { Header } from './components/Header'
+import { ShootingStars } from './components/ShootingStars'
 import { About } from './sections/About'
 import { Hero } from './sections/Hero'
 import { LatestStreams } from './sections/LatestStreams'
@@ -25,6 +26,8 @@ const FOOTER_H = Math.round(VIEW_H * CITY_SCALE)
 export default function App() {
   const [data, setData] = useState<DbData>(EMPTY)
   const [error, setError] = useState<string | null>(null)
+  // 流星群は既定でOFF。ヘッダーのトグルで切り替える
+  const [meteorsOn, setMeteorsOn] = useState(false)
 
   useEffect(() => {
     loadDbData()
@@ -34,7 +37,8 @@ export default function App() {
 
   return (
     <>
-      <Header />
+      {meteorsOn && <ShootingStars />}
+      <Header meteorsOn={meteorsOn} onToggleMeteors={() => setMeteorsOn((v) => !v)} />
 
       <div className="page">
         <Hero />

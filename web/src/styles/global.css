@@ -41,8 +41,9 @@ body {
 
 a { color: inherit; text-decoration: none; }
 
-/* ページ本体。固定フッターに隠れないよう下端を空ける */
-.page { padding-bottom: var(--footer-h); }
+/* ページ本体。固定フッターに隠れないよう下端を空ける。
+   流れ星レイヤー（z-index:1）より前面に出すため、重ね順を明示する */
+.page { padding-bottom: var(--footer-h); position: relative; z-index: 2; }
 
 /* ─────────────────────────────────────────
    ヘッダー
@@ -89,6 +90,46 @@ a { color: inherit; text-decoration: none; }
   transition: color 0.15s, background 0.15s;
 }
 .site-header__nav a:hover { color: var(--spark); background: rgba(232, 85, 47, 0.08); }
+
+/* 流星群のON/OFFトグル */
+.meteor-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 14px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--navy-soft);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s, border-color 0.18s;
+}
+.meteor-toggle:hover { color: var(--spark); border-color: var(--spark); }
+.meteor-toggle:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+.meteor-toggle.is-on { color: var(--spark); border-color: var(--spark); }
+
+.meteor-toggle__state {
+  min-width: 34px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(22, 32, 58, 0.07);
+  color: var(--navy-mute);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  transition: background 0.18s, color 0.18s;
+}
+.meteor-toggle.is-on .meteor-toggle__state { background: var(--spark); color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .meteor-toggle, .meteor-toggle__state { transition: none; }
+}
 
 /* ─────────────────────────────────────────
    セクション共通
@@ -699,8 +740,10 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 
 @media (max-width: 640px) {
   .section { padding: 68px 18px; }
-  .site-header { padding: 0 14px; gap: 10px; }
+  .site-header { padding: 0 14px; gap: 8px; }
   .site-header__logo { font-size: 12px; }
+  .meteor-toggle { padding: 5px 6px 5px 10px; font-size: 10px; gap: 6px; }
+  .meteor-toggle__state { min-width: 28px; padding: 2px 5px; font-size: 9px; }
 
   /* 狭幅では表を積層カードに切り替える */
   .songs { display: none; }
