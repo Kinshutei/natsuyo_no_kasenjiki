@@ -17,9 +17,12 @@
   --header-h: 62px;
   --maxw: 1120px;
   /* Repertoire の各タブの表示領域。切り替えで高さが跳ねないよう統一する */
-  --rep-panel-h: 460px;
-  /* Setlist の左右の表示領域。1行74px×10曲＋見出し34px */
-  --setlist-panel-h: 776px;
+  --rep-panel-h: 476px;
+  /* 一覧カードの高さ。2行あるカードに合わせて全タブで揃える */
+  --rank-card-h: 84px;
+  /* Setlist の表示領域。1行74px×7曲＋見出し34px。
+     曲数が少ない枠でも詰めずにこの高さを保つため、max-height ではなく height で使う */
+  --setlist-panel-h: 552px;
 
   --sans: 'Helvetica Neue', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
 }
@@ -418,18 +421,18 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .about { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center; }
 .about__text p { color: var(--navy-soft); }
 .about__visual {
-  aspect-ratio: 3 / 4;
-  border: 1px solid var(--line);
-  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: repeating-linear-gradient(-45deg, #fff 0 12px, #f5f7fb 12px 24px);
-  color: var(--navy-mute);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-align: center;
-  padding: 20px;
+}
+/* 紋章を円に切り、夜紺のリングを回す */
+.about__logo {
+  width: min(160px, 100%);
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid var(--navy);
+  background: #fff;
 }
 
 /* ─────────────────────────────────────────
@@ -499,9 +502,10 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .setlist__detail-head .thumb { width: 240px; border-radius: 10px; }
 .setlist__detail-title { margin: 0 0 8px; font-size: 17px; font-weight: 800; line-height: 1.5; }
 
-/* 10曲を超えたら曲リストだけをスクロールさせる */
+/* 7曲を超えたら曲リストだけをスクロールさせる。
+   高さは固定なので、曲数の少ない枠に切り替えても枠の大きさが変わらない */
 .songs-wrap {
-  max-height: var(--setlist-panel-h);
+  height: var(--setlist-panel-h);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 8px;
@@ -602,26 +606,7 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .tab-btn:hover { border-color: var(--spark); color: var(--spark); }
 .tab-btn.is-active { background: var(--navy); border-color: var(--navy); color: #fff; }
 
-.rep__table-wrap { height: var(--rep-panel-h); overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
-.rep__table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.rep__table thead th {
-  position: sticky;
-  top: 0;
-  background: #fff;
-  z-index: 1;
-  text-align: left;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: var(--navy-mute);
-  padding: 12px;
-  border-bottom: 1px solid var(--line);
-}
-.rep__table td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
-.rep__table tbody tr:last-child td { border-bottom: none; }
-.rep__table tbody tr:hover td { background: #f7f9fc; }
-.rep__count { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--spark); }
-
-/* 順位カード（歌唱回数・原曲アーティスト） */
+/* 4タブ共通の一覧カード。順位バッジは歌唱回数・リリース年・原曲アーティストのみ */
 .rank-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -636,6 +621,8 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
   align-items: center;
   gap: 14px;
   padding: 18px 20px;
+  /* 2行あるカード（楽曲一覧・歌唱回数）に合わせ、1行のタブでも同じ高さを保つ */
+  min-height: var(--rank-card-h);
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -666,37 +653,63 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 
 .rank-card__body { flex: 1; min-width: 0; }
 .rank-card__title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
-.rank-card__sub { margin-top: 3px; font-size: 11px; color: var(--navy-mute); }
+.rank-card__sub { margin-top: 3px; font-size: 12px; color: var(--navy-mute); }
 
 .rank-card__value {
   flex-shrink: 0;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 900;
   line-height: 1;
   color: var(--spark);
   font-variant-numeric: tabular-nums;
 }
 .rank-card__value span {
-  margin-left: 3px;
-  font-size: 11px;
+  margin-left: 4px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--navy-mute);
 }
 
-.chart { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; height: var(--rep-panel-h); }
-.chart__loading {
+/* ページ送り */
+.pager {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 320px;
+  gap: 16px;
+  margin-top: 22px;
+}
+.pager__btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--navy-soft);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s;
+}
+.pager__btn:hover:not(:disabled) { color: var(--spark); border-color: var(--spark); }
+.pager__btn:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+.pager__btn:disabled { opacity: 0.3; cursor: default; }
+.pager__count {
   font-size: 12px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--navy-mute);
+  font-variant-numeric: tabular-nums;
+}
+.pager__count strong { font-size: 15px; font-weight: 800; color: var(--navy); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pager__btn { transition: none; }
 }
 
 /* ─────────────────────────────────────────
@@ -720,16 +733,23 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 /* ─────────────────────────────────────────
    フッター
    ───────────────────────────────────────── */
+/* 非公式である旨の表示。Official Links の直下に寄せつつ、
+   下端はフッターのモヤ（フッター上256px）を抜ける位置まで余白を取る */
+#links { padding-bottom: 24px; }
 .site-note {
   max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 0 24px 80px;
-  font-size: 11px;
+  margin: 0 auto 220px;
+  padding: 0 24px;
+  font-size: 12px;
   line-height: 2;
-  color: var(--navy-mute);
+  color: var(--navy-soft);
   text-align: center;
 }
-.site-note strong { color: var(--navy-soft); }
+.site-note strong {
+  color: var(--navy);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
 
 /* 固定シティスケープ */
 .city-fixed {
@@ -773,7 +793,6 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
   .grid-3 { grid-template-columns: 1fr; }
   .rank-grid { grid-template-columns: 1fr; }
   .about { grid-template-columns: 1fr; gap: 28px; }
-  .about__visual { aspect-ratio: 16 / 10; }
   .numbers { grid-template-columns: repeat(2, 1fr); }
   .setlist { grid-template-columns: 1fr; }
   .setlist__list { max-height: 320px; }
@@ -791,7 +810,7 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
   /* 狭幅では表を積層カードに切り替える */
   .songs { display: none; }
   .songs-cards { display: block; }
-  .songs-wrap { max-height: 62vh; padding-right: 6px; }
+  .songs-wrap { height: 58vh; padding-right: 6px; }
   /* 狭幅では折り返して全幅に */
   .rep__search { flex: 1 1 100%; margin-left: 0; }
   .song-card {

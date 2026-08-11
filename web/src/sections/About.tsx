@@ -1,6 +1,5 @@
 import { Reveal } from '../components/Reveal'
 import { SectionHead } from '../components/SectionHead'
-import { SITE } from '../site'
 
 export function About() {
   return (
@@ -9,19 +8,23 @@ export function About() {
         <SectionHead title="About" sub="このサイトについて" />
         <div className="about">
           <Reveal className="about__text">
-            <p>{SITE.lead}</p>
+            <p>FanMadeの非公式データベースです。</p>
             <p>
-              歌枠のセットリストは配信アーカイブから手作業で記録しています。楽曲情報は
-              RK Music系ファンサイトと共通のソングマスター（<code>rkmusic_song_master.json</code>）を
-              参照しており、他サイトと同一の song_id で管理されています。
+              夜紺火花さんの歌枠にて、どのような曲が歌われたのか、
+              またはどのようなアーティストの曲が多いのかをまとめたデータベースです。
             </p>
             <p>
-              本サイトは<strong>ファンによる非公式</strong>のデータベースです。ご本人・関係各所とは
-              一切関係ありません。内容の誤りにお気づきの場合は、お手数ですが管理者までお知らせください。
+              また制作者は私・白百合と金鷲亭によるものです。
+              非公式DBとなりますので、お気づきの点やご不明点は夜紺火花さんにではなく、私宛にご連絡ください。
             </p>
           </Reveal>
           <Reveal className="about__visual" delay={120}>
-            VISUAL AREA<br />（素材差し替え予定）
+            <img
+              className="about__logo"
+              src={`${import.meta.env.BASE_URL}viju.png`}
+              alt="「戦史」同人サークル 白百合と金鷲亭の紋章"
+              loading="lazy"
+            />
           </Reveal>
         </div>
       </div>

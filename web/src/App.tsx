@@ -10,7 +10,6 @@ import { Numbers } from './sections/Numbers'
 import { PickUp } from './sections/PickUp'
 import { Repertoire } from './sections/Repertoire'
 import { Setlist } from './sections/Setlist'
-import { SITE } from './site'
 import type { DbData } from './types'
 import { loadDbData } from './utils/data'
 
@@ -64,9 +63,8 @@ export default function App() {
         <Links />
 
         <div className="site-note">
-          <strong>{SITE.title}</strong><br />
-          本サイトはファンによる非公式のデータベースです。ご本人および関係各所とは一切関係ありません。<br />
-          楽曲情報は RK Music系ファンサイト共通のソングマスターを参照しています。
+          <strong>Unofficial - YAKON HIBANA DB</strong><br />
+          ただのファンによる非公式DBであり、ご本人とは一切関係ありません。
         </div>
       </div>
 

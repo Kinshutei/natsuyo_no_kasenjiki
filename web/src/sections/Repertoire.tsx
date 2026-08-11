@@ -1,20 +1,7 @@
-import { Suspense, lazy, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Reveal } from '../components/Reveal'
 import { SectionHead } from '../components/SectionHead'
 import type { SongStat } from '../types'
-
-// Plotly は重いため、グラフのタブが押されたときに初めて読み込む
-const Chart = lazy(() => import('../components/Chart'))
-
-function ChartFrame({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="chart">
-      <Suspense fallback={<div className="chart__loading">グラフを読み込んでいます…</div>}>
-        {children}
-      </Suspense>
-    </div>
-  )
-}
 
 type Tab = 'list' | 'ranking' | 'year' | 'artist'
 
@@ -25,42 +12,56 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'artist', label: '原曲アーティスト' },
 ]
 
-/** リリース年グラフの棒色。グレー寄りのブルー */
-const STEEL = '#7d93b5'
+const PER_PAGE = 10
 
-const RANK_LIMIT = 10
-
-interface RankItem {
+interface CardItem {
   key: string
+  /** 省略すると順位バッジを出さない */
+  rank?: number
   title: string
-  sub: string
+  sub?: string
   value: number
   unit: string
 }
 
-/** 上位N件を件数の多い順に返す */
-function topCounts(values: string[], n: number): { label: string; count: number }[] {
-  const map = new Map<string, number>()
-  for (const v of values) {
-    if (!v) continue
-    map.set(v, (map.get(v) ?? 0) + 1)
+/** キーごとに楽曲をまとめ、曲数の多い順に返す。同数のときは第2キーで安定させる */
+function groupSongs(
+  stats: SongStat[],
+  key: (s: SongStat) => string,
+  tieBreak: (a: string, b: string) => number,
+): { label: string; songs: string[] }[] {
+  const map = new Map<string, string[]>()
+  for (const s of stats) {
+    const k = key(s)
+    if (!k) continue
+    const arr = map.get(k)
+    if (arr) arr.push(s.楽曲名)
+    else map.set(k, [s.楽曲名])
   }
   return Array.from(map.entries())
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'))
-    .slice(0, n)
-    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => b[1].length - a[1].length || tieBreak(a[0], b[0]))
+    .map(([label, songs]) => ({ label, songs }))
 }
 
-/** 順位カード。上位3件は番号を火花の朱で強調する */
-function RankCards({ items }: { items: RankItem[] }) {
+/** カード2行目に載せる曲名。多いときは先頭3曲＋残数 */
+function summarize(songs: string[]): string {
+  return songs.length <= 3
+    ? songs.join(' ・ ')
+    : `${songs.slice(0, 3).join(' ・ ')} 他${songs.length - 3}曲`
+}
+
+function Cards({ items }: { items: CardItem[] }) {
   if (items.length === 0) {
-    return <div className="empty-note">集計できるデータがありません。</div>
+    return <div className="empty-note">該当するデータがありません。</div>
   }
   return (
     <div className="rank-grid">
-      {items.map((item, i) => (
-        <div className={`rank-card ${i < 3 ? 'rank-card--top' : ''}`} key={item.key}>
-          <span className="rank-card__no">{i + 1}</span>
+      {items.map((item) => (
+        <div
+          className={`rank-card ${item.rank !== undefined && item.rank <= 3 ? 'rank-card--top' : ''}`}
+          key={item.key}
+        >
+          {item.rank !== undefined && <span className="rank-card__no">{item.rank}</span>}
           <div className="rank-card__body">
             <div className="rank-card__title">{item.title}</div>
             {item.sub && <div className="rank-card__sub">{item.sub}</div>}
@@ -74,21 +75,62 @@ function RankCards({ items }: { items: RankItem[] }) {
   )
 }
 
+function Pager({ page, total, onChange }: { page: number; total: number; onChange: (p: number) => void }) {
+  if (total <= 1) return null
+  return (
+    <div className="pager">
+      <button
+        type="button"
+        className="pager__btn"
+        onClick={() => onChange(page - 1)}
+        disabled={page <= 1}
+        aria-label="前のページ"
+      >
+        <span aria-hidden="true">◀</span>
+      </button>
+      <span className="pager__count">
+        <strong>{page}</strong> / {total}
+      </span>
+      <button
+        type="button"
+        className="pager__btn"
+        onClick={() => onChange(page + 1)}
+        disabled={page >= total}
+        aria-label="次のページ"
+      >
+        <span aria-hidden="true">▶</span>
+      </button>
+    </div>
+  )
+}
+
 export function Repertoire({ stats }: { stats: SongStat[] }) {
   const [tab, setTab] = useState<Tab>('list')
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
 
-  const filtered = useMemo(() => {
+  const changeTab = (t: Tab) => { setTab(t); setPage(1) }
+  const changeQuery = (q: string) => { setQuery(q); setPage(1) }
+
+  const songList = useMemo<CardItem[]>(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return stats
-    return stats.filter(
-      (s) => s.楽曲名.toLowerCase().includes(q) || s.原曲アーティスト.toLowerCase().includes(q),
-    )
+    const rows = q
+      ? stats.filter((s) =>
+          s.楽曲名.toLowerCase().includes(q) || s.原曲アーティスト.toLowerCase().includes(q))
+      : stats
+    return rows.map((s) => ({
+      key: s.song_id,
+      title: s.楽曲名,
+      sub: [s.原曲アーティスト, s.リリース年 && `${s.リリース年}年`].filter(Boolean).join(' ・ '),
+      value: s.歌唱回数,
+      unit: '回',
+    }))
   }, [stats, query])
 
-  const ranking = useMemo<RankItem[]>(
-    () => stats.slice(0, RANK_LIMIT).map((s) => ({
+  const ranking = useMemo<CardItem[]>(
+    () => stats.map((s, i) => ({
       key: s.song_id,
+      rank: i + 1,
       title: s.楽曲名,
       sub: s.原曲アーティスト,
       value: s.歌唱回数,
@@ -97,26 +139,41 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
     [stats],
   )
 
-  const yearDist = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const s of stats) {
-      if (!s.リリース年) continue
-      map.set(s.リリース年, (map.get(s.リリース年) ?? 0) + 1)
-    }
-    const labels = Array.from(map.keys()).sort()
-    return { labels, values: labels.map((y) => map.get(y) ?? 0) }
-  }, [stats])
-
-  const artistDist = useMemo<RankItem[]>(
-    () => topCounts(stats.map((s) => s.原曲アーティスト), RANK_LIMIT).map((a) => ({
-      key: a.label,
-      title: a.label,
-      sub: '',
-      value: a.count,
-      unit: '曲',
-    })),
+  const yearDist = useMemo<CardItem[]>(
+    // 曲数の多い年から並べる。同数なら新しい年を先に
+    () => groupSongs(stats, (s) => s.リリース年, (a, b) => b.localeCompare(a))
+      .map((y, i) => ({
+        key: y.label,
+        rank: i + 1,
+        title: `${y.label}年`,
+        sub: summarize(y.songs),
+        value: y.songs.length,
+        unit: '曲',
+      })),
     [stats],
   )
+
+  const artistDist = useMemo<CardItem[]>(
+    () => groupSongs(stats, (s) => s.原曲アーティスト, (a, b) => a.localeCompare(b, 'ja'))
+      .map((a, i) => ({
+        key: a.label,
+        rank: i + 1,
+        title: a.label,
+        sub: summarize(a.songs),
+        value: a.songs.length,
+        unit: '曲',
+      })),
+    [stats],
+  )
+
+  const items = tab === 'list' ? songList
+    : tab === 'ranking' ? ranking
+    : tab === 'year' ? yearDist
+    : artistDist
+
+  const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const shown = items.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
 
   return (
     <section className="section" id="repertoire">
@@ -134,7 +191,7 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
                   <button
                     key={t.id}
                     className={`tab-btn ${tab === t.id ? 'is-active' : ''}`}
-                    onClick={() => setTab(t.id)}
+                    onClick={() => changeTab(t.id)}
                   >
                     {t.label}
                   </button>
@@ -146,57 +203,13 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
                   type="search"
                   placeholder="楽曲名・原曲アーティストで検索"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => changeQuery(e.target.value)}
                 />
               )}
             </div>
 
-            {tab === 'list' && (
-              <div className="rep__table-wrap fancy-scroll">
-                <table className="rep__table">
-                  <thead>
-                    <tr>
-                      <th>SONG</th>
-                      <th>ARTIST</th>
-                      <th>RELEASE</th>
-                      <th>COUNT</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((s) => (
-                      <tr key={s.song_id}>
-                        <td className="songs__title">{s.楽曲名}</td>
-                        <td className="songs__artist">{s.原曲アーティスト || '—'}</td>
-                        <td className="songs__artist">{s.リリース年 || '—'}</td>
-                        <td className="rep__count">{s.歌唱回数}</td>
-                      </tr>
-                    ))}
-                    {filtered.length === 0 && (
-                      <tr><td colSpan={4} className="songs__artist">該当する楽曲がありません。</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {tab === 'ranking' && <RankCards items={ranking} />}
-
-            {tab === 'year' && (
-              <ChartFrame>
-                <Chart
-                  data={[{
-                    type: 'bar',
-                    x: yearDist.labels,
-                    y: yearDist.values,
-                    marker: { color: STEEL },
-                    hovertemplate: '%{x}年<br>%{y} 曲<extra></extra>',
-                  }]}
-                  height={434}
-                />
-              </ChartFrame>
-            )}
-
-            {tab === 'artist' && <RankCards items={artistDist} />}
+            <Cards items={shown} />
+            <Pager page={safePage} total={totalPages} onChange={setPage} />
           </Reveal>
         )}
       </div>
