@@ -18,6 +18,8 @@
   --maxw: 1120px;
   /* Repertoire の各タブの表示領域。切り替えで高さが跳ねないよう統一する */
   --rep-panel-h: 460px;
+  /* Setlist の左右の表示領域。1行74px×10曲＋見出し34px */
+  --setlist-panel-h: 776px;
 
   --sans: 'Helvetica Neue', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
 }
@@ -457,7 +459,7 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 
 .setlist__list {
   /* ページスクロールには追従させない。曲リスト側と高さを揃える */
-  max-height: 660px;
+  max-height: var(--setlist-panel-h);
   overflow-y: auto;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -497,15 +499,17 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .setlist__detail-head .thumb { width: 240px; border-radius: 10px; }
 .setlist__detail-title { margin: 0 0 8px; font-size: 17px; font-weight: 800; line-height: 1.5; }
 
-/* 10曲を超えたら曲リストだけをスクロールさせる（1行あたり約63px＋見出し） */
+/* 10曲を超えたら曲リストだけをスクロールさせる */
 .songs-wrap {
-  max-height: 660px;
+  max-height: var(--setlist-panel-h);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 8px;
 }
 
-.songs { width: 100%; border-collapse: collapse; font-size: 13px; }
+/* 列幅を固定する。TIMEは「1:49」「1:12:55」で桁数が変わるため、
+   auto のままだと行ごとに位置が揺れる */
+.songs { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
 .songs th {
   text-align: left;
   font-size: 10px;
@@ -517,10 +521,49 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 }
 .songs td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .songs tr:hover td { background: #f7f9fc; }
-.songs__no { width: 44px; color: var(--navy-mute); font-variant-numeric: tabular-nums; }
+.songs__no { width: 52px; color: var(--navy-mute); font-variant-numeric: tabular-nums; }
 .songs__title { font-weight: 700; }
 .songs__artist { color: var(--navy-mute); font-size: 12px; }
 .songs__link { color: var(--spark); font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+/* TIME列。時間と▶を縦に積み、全体をひとつのリンクにする */
+.songs__time { width: 112px; text-align: center; }
+.songs__play {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--spark);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.songs__play-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.4px solid var(--spark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+}
+.songs__play-btn::after {
+  content: '';
+  border-style: solid;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent var(--spark);
+  margin-left: 2px;
+  transition: border-color 0.18s;
+}
+.songs__play:hover .songs__play-btn { background: var(--spark); }
+.songs__play:hover .songs__play-btn::after { border-left-color: #fff; }
+.songs__play:focus-visible { outline: 2px solid var(--spark); outline-offset: 3px; border-radius: 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .songs__play-btn, .songs__play-btn::after { transition: none; }
+}
 
 .songs-cards { display: none; }
 

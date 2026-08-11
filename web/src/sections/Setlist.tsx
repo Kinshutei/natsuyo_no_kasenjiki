@@ -68,7 +68,7 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                         <tr>
                           <th className="songs__no">NO</th>
                           <th>SONG</th>
-                          <th>TIME</th>
+                          <th className="songs__time">TIME</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -84,10 +84,14 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                                 {song.補足情報 && ` ／ ${song.補足情報}`}
                               </div>
                             </td>
-                            <td>
-                              {song.枠URL
-                                ? <a className="songs__link" href={song.枠URL} target="_blank" rel="noopener noreferrer">{timeLabel(song) || '再生'}</a>
-                                : '—'}
+                            <td className="songs__time">
+                              {song.枠URL ? (
+                                // 時間と▶をひとつのリンクにまとめ、どちらを押しても頭出しできるようにする
+                                <a className="songs__play" href={song.枠URL} target="_blank" rel="noopener noreferrer">
+                                  <span className="songs__play-time">{timeLabel(song) || '再生'}</span>
+                                  <span className="songs__play-btn" aria-hidden="true" />
+                                </a>
+                              ) : <span className="songs__artist">—</span>}
                             </td>
                           </tr>
                         ))}
