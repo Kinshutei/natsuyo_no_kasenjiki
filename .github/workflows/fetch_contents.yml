@@ -1,0 +1,43 @@
+name: Fetch Channel Contents
+
+on:
+  schedule:
+    - cron: '0 15 * * *'   # UTC 15:00 = JST 0:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-contents
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Fetch latest contents
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python fetch_contents.py
+
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add yako_contents.json
+          git diff --staged --quiet && echo "変更なし" && exit 0
+          git commit -m "Update yako_contents.json [automated]"
+          git pull --rebase origin main
+          git push

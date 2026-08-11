@@ -1,0 +1,2 @@
+google-api-python-client==2.188.0
+isodate==0.6.1

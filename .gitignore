@@ -1,0 +1,9 @@
+.claude/settings.local.json
+.claude/settings.json
+node_modules/
+web/node_modules/
+__pycache__/
+*.pyc
+web/dist/
+package-lock.json
+web/package-lock.json
