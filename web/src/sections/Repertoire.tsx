@@ -1,8 +1,20 @@
-import { useMemo, useState } from 'react'
-import Plot from 'react-plotly.js'
+import { Suspense, lazy, useMemo, useState } from 'react'
 import { Reveal } from '../components/Reveal'
 import { SectionHead } from '../components/SectionHead'
 import type { SongStat } from '../types'
+
+// Plotly は重いため、グラフのタブが押されたときに初めて読み込む
+const Chart = lazy(() => import('../components/Chart'))
+
+function ChartFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="chart">
+      <Suspense fallback={<div className="chart__loading">グラフを読み込んでいます…</div>}>
+        {children}
+      </Suspense>
+    </div>
+  )
+}
 
 type Tab = 'list' | 'ranking' | 'year' | 'artist'
 
@@ -15,16 +27,6 @@ const TABS: { id: Tab; label: string }[] = [
 
 const NAVY = '#16203a'
 const SPARK = '#e8552f'
-
-const LAYOUT_BASE = {
-  paper_bgcolor: 'rgba(0,0,0,0)',
-  plot_bgcolor: 'rgba(0,0,0,0)',
-  font: { family: "'Hiragino Sans','Noto Sans JP',sans-serif", size: 11, color: NAVY },
-  margin: { l: 60, r: 16, t: 16, b: 60 },
-  showlegend: false,
-} as const
-
-const CONFIG = { displayModeBar: false, responsive: true } as const
 
 /** 上位N件を [ラベル, 件数] で返す */
 function topCounts(pairs: string[], n: number): { labels: string[]; values: number[] } {
@@ -127,8 +129,8 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
             )}
 
             {tab === 'ranking' && (
-              <div className="chart">
-                <Plot
+              <ChartFrame>
+                <Chart
                   data={[{
                     type: 'bar',
                     orientation: 'h',
@@ -137,17 +139,16 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
                     marker: { color: SPARK },
                     hovertemplate: '%{y}<br>%{x} 回<extra></extra>',
                   }]}
-                  layout={{ ...LAYOUT_BASE, height: Math.max(320, ranking.length * 26 + 60), margin: { l: 180, r: 16, t: 16, b: 40 } }}
-                  config={CONFIG}
-                  style={{ width: '100%' }}
-                  useResizeHandler
+                  height={Math.max(320, ranking.length * 26 + 60)}
+                  marginLeft={180}
+                  marginBottom={40}
                 />
-              </div>
+              </ChartFrame>
             )}
 
             {tab === 'year' && (
-              <div className="chart">
-                <Plot
+              <ChartFrame>
+                <Chart
                   data={[{
                     type: 'bar',
                     x: yearDist.labels,
@@ -155,17 +156,14 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
                     marker: { color: NAVY },
                     hovertemplate: '%{x}年<br>%{y} 曲<extra></extra>',
                   }]}
-                  layout={{ ...LAYOUT_BASE, height: 400 }}
-                  config={CONFIG}
-                  style={{ width: '100%' }}
-                  useResizeHandler
+                  height={400}
                 />
-              </div>
+              </ChartFrame>
             )}
 
             {tab === 'artist' && (
-              <div className="chart">
-                <Plot
+              <ChartFrame>
+                <Chart
                   data={[{
                     type: 'bar',
                     orientation: 'h',
@@ -174,12 +172,11 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
                     marker: { color: NAVY },
                     hovertemplate: '%{y}<br>%{x} 曲<extra></extra>',
                   }]}
-                  layout={{ ...LAYOUT_BASE, height: Math.max(320, artistDist.labels.length * 26 + 60), margin: { l: 160, r: 16, t: 16, b: 40 } }}
-                  config={CONFIG}
-                  style={{ width: '100%' }}
-                  useResizeHandler
+                  height={Math.max(320, artistDist.labels.length * 26 + 60)}
+                  marginLeft={160}
+                  marginBottom={40}
                 />
-              </div>
+              </ChartFrame>
             )}
           </Reveal>
         )}
