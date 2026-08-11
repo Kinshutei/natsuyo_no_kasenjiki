@@ -25,18 +25,53 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'artist', label: '原曲アーティスト' },
 ]
 
-const NAVY = '#16203a'
-const SPARK = '#e8552f'
+/** リリース年グラフの棒色。グレー寄りのブルー */
+const STEEL = '#7d93b5'
 
-/** 上位N件を [ラベル, 件数] で返す */
-function topCounts(pairs: string[], n: number): { labels: string[]; values: number[] } {
+const RANK_LIMIT = 10
+
+interface RankItem {
+  key: string
+  title: string
+  sub: string
+  value: number
+  unit: string
+}
+
+/** 上位N件を件数の多い順に返す */
+function topCounts(values: string[], n: number): { label: string; count: number }[] {
   const map = new Map<string, number>()
-  for (const p of pairs) {
-    if (!p) continue
-    map.set(p, (map.get(p) ?? 0) + 1)
+  for (const v of values) {
+    if (!v) continue
+    map.set(v, (map.get(v) ?? 0) + 1)
   }
-  const sorted = Array.from(map.entries()).sort((a, b) => b[1] - a[1]).slice(0, n)
-  return { labels: sorted.map((x) => x[0]), values: sorted.map((x) => x[1]) }
+  return Array.from(map.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'))
+    .slice(0, n)
+    .map(([label, count]) => ({ label, count }))
+}
+
+/** 順位カード。上位3件は番号を火花の朱で強調する */
+function RankCards({ items }: { items: RankItem[] }) {
+  if (items.length === 0) {
+    return <div className="empty-note">集計できるデータがありません。</div>
+  }
+  return (
+    <div className="rank-grid">
+      {items.map((item, i) => (
+        <div className={`rank-card ${i < 3 ? 'rank-card--top' : ''}`} key={item.key}>
+          <span className="rank-card__no">{i + 1}</span>
+          <div className="rank-card__body">
+            <div className="rank-card__title">{item.title}</div>
+            {item.sub && <div className="rank-card__sub">{item.sub}</div>}
+          </div>
+          <div className="rank-card__value">
+            {item.value}<span>{item.unit}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export function Repertoire({ stats }: { stats: SongStat[] }) {
@@ -51,7 +86,16 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
     )
   }, [stats, query])
 
-  const ranking = useMemo(() => stats.slice(0, 20).reverse(), [stats])
+  const ranking = useMemo<RankItem[]>(
+    () => stats.slice(0, RANK_LIMIT).map((s) => ({
+      key: s.song_id,
+      title: s.楽曲名,
+      sub: s.原曲アーティスト,
+      value: s.歌唱回数,
+      unit: '回',
+    })),
+    [stats],
+  )
 
   const yearDist = useMemo(() => {
     const map = new Map<string, number>()
@@ -63,8 +107,14 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
     return { labels, values: labels.map((y) => map.get(y) ?? 0) }
   }, [stats])
 
-  const artistDist = useMemo(
-    () => topCounts(stats.map((s) => s.原曲アーティスト), 15),
+  const artistDist = useMemo<RankItem[]>(
+    () => topCounts(stats.map((s) => s.原曲アーティスト), RANK_LIMIT).map((a) => ({
+      key: a.label,
+      title: a.label,
+      sub: '',
+      value: a.count,
+      unit: '曲',
+    })),
     [stats],
   )
 
@@ -77,16 +127,8 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
           <Reveal><div className="empty-note">歌枠データはまだ登録されていません。</div></Reveal>
         ) : (
           <Reveal>
+            {/* タブを先に置き、検索フォームは右端。タブの位置がタブ切替で動かないようにする */}
             <div className="rep__bar">
-              {tab === 'list' && (
-                <input
-                  className="rep__search"
-                  type="search"
-                  placeholder="楽曲名・原曲アーティストで検索"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              )}
               <div className="tabs">
                 {TABS.map((t) => (
                   <button
@@ -98,6 +140,15 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
                   </button>
                 ))}
               </div>
+              {tab === 'list' && (
+                <input
+                  className="rep__search"
+                  type="search"
+                  placeholder="楽曲名・原曲アーティストで検索"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              )}
             </div>
 
             {tab === 'list' && (
@@ -128,23 +179,7 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
               </div>
             )}
 
-            {tab === 'ranking' && (
-              <ChartFrame>
-                <Chart
-                  data={[{
-                    type: 'bar',
-                    orientation: 'h',
-                    x: ranking.map((s) => s.歌唱回数),
-                    y: ranking.map((s) => s.楽曲名),
-                    marker: { color: SPARK },
-                    hovertemplate: '%{y}<br>%{x} 回<extra></extra>',
-                  }]}
-                  height={Math.max(320, ranking.length * 26 + 60)}
-                  marginLeft={180}
-                  marginBottom={40}
-                />
-              </ChartFrame>
-            )}
+            {tab === 'ranking' && <RankCards items={ranking} />}
 
             {tab === 'year' && (
               <ChartFrame>
@@ -153,31 +188,15 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
                     type: 'bar',
                     x: yearDist.labels,
                     y: yearDist.values,
-                    marker: { color: NAVY },
+                    marker: { color: STEEL },
                     hovertemplate: '%{x}年<br>%{y} 曲<extra></extra>',
                   }]}
-                  height={400}
+                  height={434}
                 />
               </ChartFrame>
             )}
 
-            {tab === 'artist' && (
-              <ChartFrame>
-                <Chart
-                  data={[{
-                    type: 'bar',
-                    orientation: 'h',
-                    x: artistDist.values.slice().reverse(),
-                    y: artistDist.labels.slice().reverse(),
-                    marker: { color: NAVY },
-                    hovertemplate: '%{y}<br>%{x} 曲<extra></extra>',
-                  }]}
-                  height={Math.max(320, artistDist.labels.length * 26 + 60)}
-                  marginLeft={160}
-                  marginBottom={40}
-                />
-              </ChartFrame>
-            )}
+            {tab === 'artist' && <RankCards items={artistDist} />}
           </Reveal>
         )}
       </div>

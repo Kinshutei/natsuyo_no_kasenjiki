@@ -16,6 +16,8 @@
   --footer-h: 107px;
   --header-h: 62px;
   --maxw: 1120px;
+  /* Repertoire の各タブの表示領域。切り替えで高さが跳ねないよう統一する */
+  --rep-panel-h: 460px;
 
   --sans: 'Helvetica Neue', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', sans-serif;
 }
@@ -413,9 +415,8 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .setlist { display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; }
 
 .setlist__list {
-  position: sticky;
-  top: calc(var(--header-h) + 20px);
-  max-height: calc(100vh - var(--header-h) - 60px);
+  /* ページスクロールには追従させない。曲リスト側と高さを揃える */
+  max-height: 660px;
   overflow-y: auto;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -485,12 +486,14 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 /* ─────────────────────────────────────────
    REPERTOIRE
    ───────────────────────────────────────── */
-.rep__bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.rep__bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
 .rep__search {
-  flex: 1 1 240px;
-  padding: 10px 14px;
+  flex: 0 1 300px;
+  margin-left: auto;
+  /* タブボタンと同じ高さにして、検索欄の有無でバーの高さが変わらないようにする */
+  padding: 8px 16px;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   color: inherit;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -515,7 +518,7 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .tab-btn:hover { border-color: var(--spark); color: var(--spark); }
 .tab-btn.is-active { background: var(--navy); border-color: var(--navy); color: #fff; }
 
-.rep__table-wrap { max-height: 560px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.rep__table-wrap { height: var(--rep-panel-h); overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
 .rep__table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .rep__table thead th {
   position: sticky;
@@ -534,7 +537,74 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .rep__table tbody tr:hover td { background: #f7f9fc; }
 .rep__count { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--spark); }
 
-.chart { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+/* 順位カード（歌唱回数・原曲アーティスト） */
+.rank-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: min-content;
+  align-content: start;
+  gap: 14px 20px;
+  min-height: var(--rep-panel-h);
+}
+.rank-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.rank-card:hover { border-color: var(--spark); transform: translateY(-2px); }
+
+/* 順位はカード左上に食い込ませる */
+.rank-card__no {
+  position: absolute;
+  top: -9px;
+  left: -9px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: 9px;
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.rank-card--top .rank-card__no { background: var(--spark); }
+
+.rank-card__body { flex: 1; min-width: 0; }
+.rank-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.rank-card__sub { margin-top: 3px; font-size: 11px; color: var(--navy-mute); }
+
+.rank-card__value {
+  flex-shrink: 0;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--spark);
+  font-variant-numeric: tabular-nums;
+}
+.rank-card__value span {
+  margin-left: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy-mute);
+}
+
+.chart { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; height: var(--rep-panel-h); }
 .chart__loading {
   display: flex;
   align-items: center;
@@ -595,7 +665,7 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
   left: 0;
   right: 0;
   bottom: 100%;
-  height: 128px;
+  height: 256px;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
@@ -617,11 +687,12 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
    ───────────────────────────────────────── */
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: 1fr; }
+  .rank-grid { grid-template-columns: 1fr; }
   .about { grid-template-columns: 1fr; gap: 28px; }
   .about__visual { aspect-ratio: 16 / 10; }
   .numbers { grid-template-columns: repeat(2, 1fr); }
   .setlist { grid-template-columns: 1fr; }
-  .setlist__list { position: static; max-height: 320px; }
+  .setlist__list { max-height: 320px; }
   .setlist__detail-head { flex-direction: column; }
   .setlist__detail-head .thumb { width: 100%; }
 }
@@ -635,6 +706,8 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
   .songs { display: none; }
   .songs-cards { display: block; }
   .songs-wrap { max-height: 62vh; padding-right: 6px; }
+  /* 狭幅では折り返して全幅に */
+  .rep__search { flex: 1 1 100%; margin-left: 0; }
   .song-card {
     border: 1px solid var(--line);
     border-radius: 10px;
