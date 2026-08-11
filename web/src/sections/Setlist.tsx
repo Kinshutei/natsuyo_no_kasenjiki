@@ -28,7 +28,7 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
         ) : (
           <Reveal>
             <div className="setlist">
-              <div className="setlist__list">
+              <div className="setlist__list fancy-scroll">
                 {streams.map((s, i) => (
                   <button
                     key={s.key}
@@ -62,12 +62,12 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                       </div>
                     </div>
 
+                    <div className="songs-wrap fancy-scroll">
                     <table className="songs">
                       <thead>
                         <tr>
                           <th className="songs__no">NO</th>
                           <th>SONG</th>
-                          <th>KEY</th>
                           <th>TIME</th>
                         </tr>
                       </thead>
@@ -84,7 +84,6 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                                 {song.補足情報 && ` ／ ${song.補足情報}`}
                               </div>
                             </td>
-                            <td className="songs__artist">{song.キー || '—'}</td>
                             <td>
                               {song.枠URL
                                 ? <a className="songs__link" href={song.枠URL} target="_blank" rel="noopener noreferrer">{timeLabel(song) || '再生'}</a>
@@ -104,10 +103,7 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                             <span className="song-card__title">{song.楽曲名}</span>
                             {song.初歌唱 && <span className="badge">初歌唱</span>}
                           </div>
-                          <div className="song-card__meta">
-                            {song.原曲アーティスト}
-                            {song.キー && ` ／ キー ${song.キー}`}
-                          </div>
+                          <div className="song-card__meta">{song.原曲アーティスト}</div>
                           {song.枠URL && (
                             <a className="songs__link" href={song.枠URL} target="_blank" rel="noopener noreferrer">
                               {timeLabel(song) || '再生'} →
@@ -115,6 +111,7 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                           )}
                         </div>
                       ))}
+                    </div>
                     </div>
                   </>
                 )}

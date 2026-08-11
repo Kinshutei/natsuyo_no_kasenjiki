@@ -99,7 +99,7 @@ export function Repertoire({ stats }: { stats: SongStat[] }) {
             </div>
 
             {tab === 'list' && (
-              <div className="rep__table-wrap">
+              <div className="rep__table-wrap fancy-scroll">
                 <table className="rep__table">
                   <thead>
                     <tr>

@@ -49,7 +49,7 @@ export function LatestStreams({ contents, streams, streamByVideoId }: Props) {
           <Reveal><div className="empty-note">まだデータが登録されていません。</div></Reveal>
         ) : (
           <Reveal>
-            <div className="rail">
+            <div className="rail fancy-scroll">
               {items.map(({ key, ...card }) => <VideoCard key={key} {...card} />)}
             </div>
           </Reveal>
