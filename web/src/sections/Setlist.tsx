@@ -1,7 +1,11 @@
 import { useState } from 'react'
+import { Pager } from '../components/Pager'
 import { Reveal } from '../components/Reveal'
 import { SectionHead } from '../components/SectionHead'
 import type { StreamEntry, SungSong } from '../types'
+
+/** 1ページに載せる曲数。表示領域の高さもこの曲数に合わせている */
+const PER_PAGE = 7
 
 function timeLabel(song: SungSong): string {
   const m = song.枠URL.match(/[?&]t=(\d+)/)
@@ -16,7 +20,16 @@ function timeLabel(song: SungSong): string {
 
 export function Setlist({ streams }: { streams: StreamEntry[] }) {
   const [selected, setSelected] = useState(0)
+  const [page, setPage] = useState(1)
   const current = streams[selected]
+
+  // 枠を切り替えたら1ページ目に戻す
+  const selectStream = (i: number) => { setSelected(i); setPage(1) }
+
+  const totalPages = Math.max(1, Math.ceil((current?.songs.length ?? 0) / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const start = (safePage - 1) * PER_PAGE
+  const shown = current ? current.songs.slice(start, start + PER_PAGE) : []
 
   return (
     <section className="section" id="setlist">
@@ -33,7 +46,7 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                   <button
                     key={s.key}
                     className={`setlist__item ${i === selected ? 'is-active' : ''}`}
-                    onClick={() => setSelected(i)}
+                    onClick={() => selectStream(i)}
                   >
                     <div className="setlist__item-date">{s.配信日} ・ {s.songs.length}曲</div>
                     <div className="setlist__item-title">{s.枠名}</div>
@@ -62,7 +75,7 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                       </div>
                     </div>
 
-                    <div className="songs-wrap fancy-scroll">
+                    <div className="songs-wrap">
                     <table className="songs">
                       <thead>
                         <tr>
@@ -72,9 +85,9 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {current.songs.map((song, i) => (
-                          <tr key={`${song.song_id}_${i}`}>
-                            <td className="songs__no">{song.歌唱順 || i + 1}</td>
+                        {shown.map((song, i) => (
+                          <tr key={`${song.song_id}_${start + i}`}>
+                            <td className="songs__no">{song.歌唱順 || start + i + 1}</td>
                             <td>
                               <div className="songs__title">
                                 {song.楽曲名} {song.初歌唱 && <span className="badge">初歌唱</span>}
@@ -100,10 +113,10 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
 
                     {/* 狭幅ではカード表示に切り替わる */}
                     <div className="songs-cards">
-                      {current.songs.map((song, i) => (
-                        <div className="song-card" key={`c_${song.song_id}_${i}`}>
+                      {shown.map((song, i) => (
+                        <div className="song-card" key={`c_${song.song_id}_${start + i}`}>
                           <div className="song-card__head">
-                            <span className="song-card__no">{song.歌唱順 || i + 1}</span>
+                            <span className="song-card__no">{song.歌唱順 || start + i + 1}</span>
                             <span className="song-card__title">{song.楽曲名}</span>
                             {song.初歌唱 && <span className="badge">初歌唱</span>}
                           </div>
@@ -117,6 +130,8 @@ export function Setlist({ streams }: { streams: StreamEntry[] }) {
                       ))}
                     </div>
                     </div>
+
+                    <Pager page={safePage} total={totalPages} onChange={setPage} />
                   </>
                 )}
               </div>

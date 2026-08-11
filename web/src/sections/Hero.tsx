@@ -23,7 +23,11 @@ export function Hero() {
           </p>
         </div>
 
-        <p className="hero__lead">{SITE.lead}</p>
+        <p className="hero__lead">
+          <span>{SITE.leadParts[0]}</span>
+          <span className="hero__lead-sep"> - </span>
+          <span>{SITE.leadParts[1]}</span>
+        </p>
         <p className="hero__scroll">SCROLL</p>
       </div>
     </section>

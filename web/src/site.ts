@@ -3,7 +3,8 @@ export const SITE = {
   name: '夜紺 火花',
   nameRomaji: 'YAKON HIBANA',
   title: '【非公式】夜紺 火花 DB',
-  lead: 'ファンメイドの非公式データベース - 夜紺さんの歌枠のセトリ＆楽曲情報まとめ',
+  /** ヒーローのリード文。狭幅では2行に分けて表示する */
+  leadParts: ['ファンメイドの非公式データベース', '夜紺さんの歌枠のセトリ＆楽曲情報まとめ'],
   links: [
     { label: 'YouTube', url: 'https://www.youtube.com/@YakonHibana' },
     { label: 'X', url: 'https://x.com/NIGHT_IS_NAVY' },

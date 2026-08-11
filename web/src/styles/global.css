@@ -311,6 +311,7 @@ a { color: inherit; text-decoration: none; }
 }
 .hero__romaji-gap { width: 0.4em; }
 .hero__lead { margin-top: 26px; max-width: 46em; color: var(--navy-soft); }
+.hero__lead span { display: inline; }
 .hero__scroll {
   margin-top: 46px;
   font-size: 11px;
@@ -502,13 +503,11 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 .setlist__detail-head .thumb { width: 240px; border-radius: 10px; }
 .setlist__detail-title { margin: 0 0 8px; font-size: 17px; font-weight: 800; line-height: 1.5; }
 
-/* 7曲を超えたら曲リストだけをスクロールさせる。
-   高さは固定なので、曲数の少ない枠に切り替えても枠の大きさが変わらない */
+/* 7曲ごとにページ送りする。高さは固定なので、
+   曲数の少ない枠やページ末尾でも枠の大きさが変わらない */
 .songs-wrap {
   height: var(--setlist-panel-h);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 8px;
+  overflow: hidden;
 }
 
 /* 列幅を固定する。TIMEは「1:49」「1:12:55」で桁数が変わるため、
@@ -738,7 +737,7 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
 #links { padding-bottom: 24px; }
 .site-note {
   max-width: var(--maxw);
-  margin: 0 auto 220px;
+  margin: 40px auto 220px;
   padding: 0 24px;
   font-size: 12px;
   line-height: 2;
@@ -749,6 +748,7 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
   color: var(--navy);
   font-size: 13px;
   letter-spacing: 0.06em;
+  margin-right: 14px;
 }
 
 /* 固定シティスケープ */
@@ -810,7 +810,11 @@ a:hover .play-badge__icon { background: var(--spark); transform: scale(1.08); }
   /* 狭幅では表を積層カードに切り替える */
   .songs { display: none; }
   .songs-cards { display: block; }
-  .songs-wrap { height: 58vh; padding-right: 6px; }
+  .songs-wrap { height: auto; }
+
+  /* リード文は2行に分ける。区切りの「-」を消す側を詳細度で勝たせる */
+  .hero__lead span { display: block; }
+  .hero__lead span.hero__lead-sep { display: none; }
   /* 狭幅では折り返して全幅に */
   .rep__search { flex: 1 1 100%; margin-left: 0; }
   .song-card {

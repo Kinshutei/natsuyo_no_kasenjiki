@@ -63,8 +63,8 @@ export default function App() {
         <Links />
 
         <div className="site-note">
-          <strong>Unofficial - YAKON HIBANA DB</strong><br />
-          ただのファンによる非公式DBであり、ご本人とは一切関係ありません。
+          <strong>Unofficial - YAKON HIBANA DB</strong>
+          <span>ただのファンによる非公式DBであり、ご本人とは一切関係ありません。</span>
         </div>
       </div>
 
