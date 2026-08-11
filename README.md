@@ -71,7 +71,14 @@ natsuyo_no_kasenjiki/
 | title | タイトル |
 | published_at | 配信開始時刻（`actualStartTime`。通常動画は公開日時） |
 | duration_sec | 再生時間（秒） |
-| type | `Short`（60秒以下）/ `LiveArchive`（配信）/ `Movie` |
+| type | `Short` / `LiveArchive` / `Movie` |
+
+種別の判定順序は `RKMusic_AllSinger_PFR` の `determine_video_type` に合わせています。
+
+1. **Short** — `youtube.com/shorts/{id}` へのHEADリクエストがShortsのURLのままリダイレクトされるか（再生時間では判定しない）
+2. 再生時間 **6分以上 → `LiveArchive`** ／ **6分未満 → `Movie`**
+
+配信直後は API が再生時間0を返すため、その場合のみ `LiveArchive` として扱い、翌日の実行で正しい値に上書きします。
 
 ## データ更新
 

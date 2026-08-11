@@ -8,28 +8,50 @@ GitHub Actions から1日1回実行される想定。
 import json
 import os
 import sys
+import time
 from pathlib import Path
 
 import isodate
+import requests
 from googleapiclient.discovery import build
 
 CHANNEL_ID = 'UCgKjo_iSJpFmXQypArDztYA'  # 夜紺 火花 / Yakon Hibana
 MAX_ITEMS = 12
-SHORT_MAX_SEC = 60
+LIVE_MIN_SEC = 6 * 60
 OUTPUT = Path(__file__).parent / 'yako_contents.json'
 
 
-def classify(duration_sec: int, is_live: bool) -> str:
-    """Short / LiveArchive / Movie に分類する。
+def is_short_video(video_id: str) -> bool:
+    """ShortsのURLにアクセスしてリダイレクト先で判定する。
 
-    liveStreamingDetails の有無で配信かどうかを判定できるため、
-    ここでは時間のみの判定ではなく配信情報を優先する。
+    再生時間での判定では60秒前後の歌ってみた等を取りこぼすため、
+    RKMusic_AllSinger_PFR と同じくURLリダイレクトで判定する。
     """
-    if 0 < duration_sec <= SHORT_MAX_SEC:
+    url = f'https://www.youtube.com/shorts/{video_id}'
+    for attempt in range(3):
+        try:
+            res = requests.head(url, allow_redirects=True, timeout=5)
+            return 'shorts' in res.url.lower()
+        except Exception:
+            if attempt < 2:
+                time.sleep(2 ** attempt)
+    return False
+
+
+def classify(video_id: str, duration_sec: int) -> str:
+    """判定順序は RKMusic_AllSinger_PFR の determine_video_type に合わせる。
+
+    1. Short（URLリダイレクト判定）
+    2. 6分以上 → LiveArchive ／ 6分未満 → Movie
+
+    配信直後は duration が 0 で返るため、6分未満扱いにせず LiveArchive とする。
+    翌日以降の実行で正しい秒数に上書きされる。
+    """
+    if is_short_video(video_id):
         return 'Short'
-    if is_live:
+    if duration_sec <= 0:
         return 'LiveArchive'
-    return 'Movie'
+    return 'LiveArchive' if duration_sec >= LIVE_MIN_SEC else 'Movie'
 
 
 def main() -> int:
@@ -81,7 +103,7 @@ def main() -> int:
             # 配信は公開日時ではなく実際の開始時刻を配信日として扱う
             'published_at': live.get('actualStartTime') or snippet['publishedAt'],
             'duration_sec': duration,
-            'type': classify(duration, bool(live)),
+            'type': classify(vid, duration),
         })
 
     entries.sort(key=lambda e: e['published_at'], reverse=True)
