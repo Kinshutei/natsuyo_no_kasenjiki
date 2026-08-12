@@ -2,7 +2,7 @@
 export const SITE = {
   name: '夜紺 火花',
   nameRomaji: 'YAKON HIBANA',
-  title: '【非公式】夜紺 火花 DB',
+  title: '【非公式DB】夏夜の河川敷',
   /** ヒーローのリード文。狭幅では2行に分けて表示する */
   leadParts: ['ファンメイドの非公式データベース', '夜紺さんの歌枠のセトリ＆楽曲情報まとめ'],
   links: [
