@@ -1,4 +1,4 @@
-# 【非公式DB】夏夜の河川敷
+# 【非公式】夏夜の河川敷_Unofficial Setlist Database
 
 個人勢VSinger **夜紺 火花 / Yakon Hibana** さんの歌枠セットリスト・楽曲データをまとめた、
 ファンメイドの非公式データベースサイトです。GitHub Pages でホストされています。
