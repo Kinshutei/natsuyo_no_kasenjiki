@@ -1,37 +1,9 @@
 [
   {
-    "video_id": "pN3NWZTN6kY",
-    "title": "【デビュー8日目 #歌枠】ハロー、君たち【#夜は紺色 #vsinger 】",
-    "published_at": "2026-08-14T09:57:25Z",
-    "duration_sec": 15074,
-    "type": "LiveArchive"
-  },
-  {
     "video_id": "cuyzxm6QOuY",
     "title": "【雑談】ねえねえねえねえ【#新人Vtuber #vsinger 】",
     "published_at": "2026-08-13T11:57:55Z",
     "duration_sec": 7805,
-    "type": "LiveArchive"
-  },
-  {
-    "video_id": "sFlNLdhA2LU",
-    "title": "【歌枠】夏だ！うれしい！！【#夜は紺色 #vsinger 】",
-    "published_at": "2026-08-12T09:57:11Z",
-    "duration_sec": 14990,
-    "type": "LiveArchive"
-  },
-  {
-    "video_id": "IOjkhOJ0sKc",
-    "title": "【耐久歌枠】3500人、搔っ攫わせていただきます。【#夜は紺色 #vsinger 】",
-    "published_at": "2026-08-11T04:00:17Z",
-    "duration_sec": 22096,
-    "type": "LiveArchive"
-  },
-  {
-    "video_id": "bmWD6bOO2Hw",
-    "title": "【歌枠】初めての、歌枠。【#新人Vtuber #vsinger 】",
-    "published_at": "2026-08-09T09:59:43Z",
-    "duration_sec": 11924,
     "type": "LiveArchive"
   },
   {
@@ -52,7 +24,7 @@
     "video_id": "4yDMPeMT4pU",
     "title": "【#初配信】こんばんは、夜紺火花です。【#新人Vtuber #vsinger 】",
     "published_at": "2026-08-05T11:58:01Z",
-    "duration_sec": 5274,
+    "duration_sec": 5009,
     "type": "LiveArchive"
   },
   {
@@ -81,6 +53,34 @@
     "title": "【#cover 】なんでもないや／RADWIMPS【#歌ってみた 】 #vtuber準備中 #Vsinger #VTuber",
     "published_at": "2026-07-30T09:00:21Z",
     "duration_sec": 50,
+    "type": "Short"
+  },
+  {
+    "video_id": "XlYvUcHdsb4",
+    "title": "ド屑／なきそ【歌ってみた】 #vtuber準備中 #歌ってみた #Vsinger #shorts",
+    "published_at": "2026-07-28T09:00:03Z",
+    "duration_sec": 30,
+    "type": "Short"
+  },
+  {
+    "video_id": "YIgGvvpTa3M",
+    "title": "【聞こえたら返事して？】mosi mosi?／楽音【#歌ってみた】#shorts #vtuber準備中 #新人VTuber #Vsinger",
+    "published_at": "2026-07-26T09:00:36Z",
+    "duration_sec": 21,
+    "type": "Short"
+  },
+  {
+    "video_id": "XOssbMLcVc4",
+    "title": "【歌ってみた】シリウスの心臓／ヰ世界情緒 #vsinger #歌ってみた #vtuber準備中 #VTuber #shorts",
+    "published_at": "2026-07-24T09:00:36Z",
+    "duration_sec": 60,
+    "type": "Short"
+  },
+  {
+    "video_id": "hRe-9NZir38",
+    "title": "楽勝でした #vsinger #vtuber準備中 #歌ってみた #VTuber #shorts",
+    "published_at": "2026-07-22T09:00:28Z",
+    "duration_sec": 36,
     "type": "Short"
   }
 ]
