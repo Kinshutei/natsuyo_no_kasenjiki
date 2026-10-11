@@ -1,5 +1,12 @@
 [
   {
+    "video_id": "LuDSY0dIC78",
+    "title": "道しるべのまま - しゅーりん feat.夜紺火花【MV】",
+    "published_at": "2026-10-11T11:00:06Z",
+    "duration_sec": 220,
+    "type": "Movie"
+  },
+  {
     "video_id": "5Q7vi_bb8tc",
     "title": "【#歌枠￤#KARAOKE 】一曲入魂。【#新人Vtuber #vsinger #夜は紺色】",
     "published_at": "2026-10-07T09:59:07Z",
@@ -74,13 +81,6 @@
     "title": "【#歌枠 ￤#karaoke 】初見さん、もしもし。【#新人Vtuber #vsinger #夜は紺色】",
     "published_at": "2026-09-09T09:59:14Z",
     "duration_sec": 16162,
-    "type": "LiveArchive"
-  },
-  {
-    "video_id": "NseSoxDvRoE",
-    "title": "【#歌枠】デビュー１ヵ月記念！【#新人Vtuber #vsinger #夜は紺色】",
-    "published_at": "2026-09-04T09:59:34Z",
-    "duration_sec": 14916,
     "type": "LiveArchive"
   }
 ]
