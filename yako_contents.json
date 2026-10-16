@@ -1,5 +1,12 @@
 [
   {
+    "video_id": "uR7v1Dq8ZO0",
+    "title": "眩い夏に、焦がれている。",
+    "published_at": "2026-10-16T11:00:10Z",
+    "duration_sec": 31,
+    "type": "Short"
+  },
+  {
     "video_id": "Eg-jzXO37L8",
     "title": "弱さも傷も抱きしめてくれた君へ。 #vsinger #VTuber #オリジナル曲 #夏",
     "published_at": "2026-10-15T11:00:05Z",
@@ -74,13 +81,6 @@
     "title": "【#歌枠 ￤#karaoke 】初見さん、こんばんは。【#新人Vtuber #vsinger #夜は紺色】",
     "published_at": "2026-09-17T10:29:34Z",
     "duration_sec": 0,
-    "type": "LiveArchive"
-  },
-  {
-    "video_id": "KWJnj1dGaYU",
-    "title": "【#歌枠 ￤#karaoke 】初見さん、こんばんは。【#新人Vtuber #vsinger #夜は紺色】",
-    "published_at": "2026-09-16T09:59:19Z",
-    "duration_sec": 14719,
     "type": "LiveArchive"
   }
 ]
