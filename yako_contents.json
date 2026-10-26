@@ -1,5 +1,12 @@
 [
   {
+    "video_id": "dkbWplbL8y8",
+    "title": "【#誕生日 】今日もここで歌うよ。【#新人Vtuber #vsinger #夜は紺色】",
+    "published_at": "2026-10-26T10:07:54Z",
+    "duration_sec": 0,
+    "type": "LiveArchive"
+  },
+  {
     "video_id": "ojwvJS-QQfE",
     "title": "【#歌枠￤#KARAOKE 】外暗くなるの早いね。【#新人Vtuber #vsinger #夜は紺色】",
     "published_at": "2026-10-21T09:59:37Z",
@@ -75,12 +82,5 @@
     "published_at": "2026-09-22T11:00:06Z",
     "duration_sec": 289,
     "type": "Movie"
-  },
-  {
-    "video_id": "EBwGj-vpxK4",
-    "title": "【#夜に溶ける歌枠リレー 】初めまして、夜を紺色に染めます。【#新人Vtuber #vsinger #夜は紺色】",
-    "published_at": "2026-09-20T11:57:28Z",
-    "duration_sec": 1913,
-    "type": "LiveArchive"
   }
 ]
